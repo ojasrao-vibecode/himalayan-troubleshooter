@@ -23,8 +23,17 @@ def _to_data_url(filename: str) -> str:
     with open(path, "rb") as f:
         return f"data:{mime};base64," + base64.b64encode(f.read()).decode()
 
-_BG_DATA_URL   = _to_data_url("bike_bg.png")
-_LOGO_DATA_URL = _to_data_url("re_logo.png")
+def _safe_data_url(filename: str) -> str:
+    path = os.path.abspath(os.path.join(os.path.dirname(__file__), filename))
+    if not os.path.exists(path):
+        raise FileNotFoundError(
+            f"Required image '{filename}' not found at {path}. "
+            "Make sure bike_bg.png and re_logo.png are in the project folder."
+        )
+    return _to_data_url(filename)
+
+_BG_DATA_URL   = _safe_data_url("bike_bg.png")
+_LOGO_DATA_URL = _safe_data_url("re_logo.png")
 
 # ── Theme ────────────────────────────────────────────────────────────────────
 theme = gr.themes.Base(
@@ -133,35 +142,6 @@ footer {{ display: none !important; }}
 #mic-row > * {{ flex: 1 1 0; min-width: 0; }}
 #mic-row .block {{ height: 100% !important; }}
 
-/* ── Loading animation ── */
-.loading-msg {{
-    display: flex;
-    align-items: center;
-    gap: 6px;
-    padding: 4px 0;
-}}
-.ld-dot {{
-    width: 9px;
-    height: 9px;
-    border-radius: 50%;
-    background: #F5B800;
-    display: inline-block;
-    animation: ld-bounce 1.2s infinite ease-in-out;
-}}
-.ld-dot:nth-child(1) {{ animation-delay: 0s; }}
-.ld-dot:nth-child(2) {{ animation-delay: 0.2s; }}
-.ld-dot:nth-child(3) {{ animation-delay: 0.4s; }}
-@keyframes ld-bounce {{
-    0%, 80%, 100% {{ transform: scale(0.7); opacity: 0.4; }}
-    40%            {{ transform: scale(1.2); opacity: 1.0; }}
-}}
-.ld-text {{
-    font-size: 0.95rem;
-    font-weight: 700;
-    color: #6B5820;
-    letter-spacing: 0.03em;
-    margin-left: 4px;
-}}
 
 /* ── Footer ── */
 #footer-hint {{
@@ -181,14 +161,7 @@ def _image_to_b64(pil_img: Image.Image) -> tuple[str, str]:
     return base64.b64encode(buf.getvalue()).decode(), "image/jpeg"
 
 
-LOADING_HTML = (
-    '<div class="loading-msg">'
-    '<span class="ld-dot"></span>'
-    '<span class="ld-dot"></span>'
-    '<span class="ld-dot"></span>'
-    '<span class="ld-text">Loading, please wait…</span>'
-    '</div>'
-)
+LOADING_MSG = "⏳ Loading, please wait…"
 
 def submit(text_input, audio_input, image_input, pdf_path, api_history, chat_messages):
     question = (text_input or "").strip()
@@ -231,7 +204,7 @@ def submit(text_input, audio_input, image_input, pdf_path, api_history, chat_mes
     # ── Step 1: show user message + loading indicator immediately ──
     loading_msgs = chat_messages + [
         {"role": "user", "content": user_display},
-        {"role": "assistant", "content": LOADING_HTML},
+        {"role": "assistant", "content": LOADING_MSG},
     ]
     yield api_history, loading_msgs, "", None, None
 
@@ -337,7 +310,7 @@ with gr.Blocks(title="Himalayan Troubleshooter") as demo:
         label="",
         show_label=False,
         height=460,
-        sanitize_html=False,
+        sanitize_html=True,
         placeholder=(
             "<div style='text-align:center;color:#BCBAB6;"
             "font-size:0.85rem;padding:80px 0'>"
