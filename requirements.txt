@@ -1,0 +1,7 @@
+anthropic
+gradio
+Pillow
+pypdf
+openai-whisper
+python-dotenv
+numpy
