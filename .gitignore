@@ -1,0 +1,19 @@
+# Environment
+.env
+
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+.venv/
+venv/
+env/
+
+# Whisper model cache
+~/.cache/whisper/
+
+# macOS
+.DS_Store
+
+# Logs
+*.log
