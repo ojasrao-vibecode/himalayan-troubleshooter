@@ -2,6 +2,7 @@ import base64
 import io
 import os
 
+import anthropic
 import gradio as gr
 import numpy as np
 from PIL import Image
@@ -230,8 +231,17 @@ def submit(text_input, audio_input, image_input, pdf_path, api_history, chat_mes
             image_b64=image_b64,
             image_media_type=image_media_type,
         )
+    except anthropic.AuthenticationError:
+        answer = "Invalid API key — check your ANTHROPIC_API_KEY in the .env file."
+        new_history = api_history
+    except anthropic.RateLimitError:
+        answer = "Rate limit reached — please wait a moment and try again."
+        new_history = api_history
+    except anthropic.APIConnectionError:
+        answer = "Could not reach the Anthropic API — check your internet connection."
+        new_history = api_history
     except Exception as exc:
-        answer = f"Error: {exc}"
+        answer = f"Something went wrong: {exc}"
         new_history = api_history
 
     final_msgs = chat_messages + [
