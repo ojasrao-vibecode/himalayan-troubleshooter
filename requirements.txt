@@ -1,7 +1,7 @@
-anthropic
-gradio
-Pillow
-pypdf
-openai-whisper
-python-dotenv
-numpy
+anthropic==0.97.0
+gradio==6.13.0
+Pillow==12.2.0
+pypdf==6.10.2
+openai-whisper==20250625
+python-dotenv==1.2.2
+numpy==2.4.4
