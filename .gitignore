@@ -15,5 +15,11 @@ env/
 # macOS
 .DS_Store
 
+# Gradio
+.gradio/
+
 # Logs
 *.log
+
+# macOS
+.DS_Store

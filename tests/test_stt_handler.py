@@ -1,3 +1,4 @@
+from unittest.mock import patch
 import numpy as np
 import stt_handler
 
@@ -25,6 +26,13 @@ def test_int16_audio_normalised_to_float_range():
     normalised = audio / peak
     assert normalised.max() <= 1.0
     assert normalised.min() >= -1.0
+
+
+def test_whisper_failure_returns_error_string():
+    with patch("stt_handler._get_model") as mock_get_model:
+        mock_get_model.return_value.transcribe.side_effect = RuntimeError("model error")
+        result = stt_handler.transcribe(16000, np.ones(16000, dtype=np.float32))
+    assert result.startswith("[Voice transcription failed:")
 
 
 def test_resampling_changes_length():

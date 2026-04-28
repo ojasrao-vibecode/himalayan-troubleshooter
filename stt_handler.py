@@ -26,9 +26,7 @@ def transcribe(sample_rate: int, audio_data: np.ndarray) -> str:
     audio = audio.astype(np.float32)
     peak = np.abs(audio).max()
     if peak > 1.0:
-        audio /= peak  # already int16 range → divide by 32768 equivalent
-    if audio.max() > 1.0 or audio.min() < -1.0:
-        audio = audio / 32768.0
+        audio = audio / 32768.0  # int16 range → float32
 
     # Resample to 16 kHz (Whisper's required sample rate)
     if sample_rate != 16000:
