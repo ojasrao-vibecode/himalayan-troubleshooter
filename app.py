@@ -195,7 +195,14 @@ def submit(text_input, audio_input, image_input, pdf_path, api_history, chat_mes
 
     if audio_input is not None and not question:
         sample_rate, audio_data = audio_input
-        question = stt_handler.transcribe(sample_rate, np.array(audio_data))
+        transcribed = stt_handler.transcribe(sample_rate, np.array(audio_data))
+        if transcribed.startswith("[Voice transcription failed"):
+            msgs = chat_messages + [
+                {"role": "assistant", "content": "Could not transcribe your voice input. Please try again or type your question."},
+            ]
+            yield api_history, msgs, "", None, None
+            return
+        question = transcribed
 
     if not question:
         yield api_history, chat_messages, "", None, None
@@ -204,7 +211,7 @@ def submit(text_input, audio_input, image_input, pdf_path, api_history, chat_mes
     if not pdf_path or not os.path.exists(pdf_path):
         msgs = chat_messages + [
             {"role": "user", "content": question},
-            {"role": "assistant", "content": "No valid PDF found — check the path in Manual Settings."},
+            {"role": "assistant", "content": "No valid PDF found — make sure Owner Manual-Himalayan.pdf is in the project folder."},
         ]
         yield api_history, msgs, "", None, None
         return

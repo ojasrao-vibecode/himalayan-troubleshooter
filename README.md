@@ -31,7 +31,7 @@ bike_troubleshooter/
 
 **Key design decisions:**
 - PDF is extracted as text (not base64) to stay within Claude's token limits
-- Whisper runs locally with numpy input to avoid ffmpeg binary dependency on ARM Macs
+- Whisper accepts numpy arrays directly, bypassing ffmpeg for ARM Mac compatibility
 - System prompt + manual text both use `cache_control: ephemeral` to minimise token cost on multi-turn conversations
 - Background image and logo are base64-embedded to avoid Gradio 6 file-serving issues
 
@@ -52,11 +52,6 @@ cd himalayan-troubleshooter
 pip install -r requirements.txt
 ```
 
-> **Apple Silicon (M1/M2/M3):** Install `ffmpeg` via Homebrew for full audio format support:
-> ```bash
-> brew install ffmpeg
-> ```
-
 ### 3. Add your API key
 
 ```bash
@@ -66,24 +61,13 @@ cp .env.example .env
 
 Get a key at [console.anthropic.com](https://console.anthropic.com).
 
-### 4. Add the owner's manual PDF
-
-Place the Himalayan owner's manual PDF in the project folder and name it:
-```
-Owner Manual-Himalayan.pdf
-```
-
-### 5. Run
+### 4. Run
 
 ```bash
 python app.py
 ```
 
-To share a public link (expires in 72 hours):
-```bash
-# Set share=True in the last line of app.py, then:
-python app.py
-```
+> To share a public link (expires in 72 hours), set `share=True` in the last line of `app.py` before running.
 
 ---
 
