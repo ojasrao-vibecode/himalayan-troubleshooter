@@ -202,6 +202,12 @@ def submit(text_input, audio_input, image_input, pdf_path, api_history, chat_mes
             ]
             yield api_history, msgs, "", None, None
             return
+        if not transcribed:
+            msgs = chat_messages + [
+                {"role": "assistant", "content": "No speech detected. Please record again and speak clearly."},
+            ]
+            yield api_history, msgs, "", None, None
+            return
         question = transcribed
 
     if not question:

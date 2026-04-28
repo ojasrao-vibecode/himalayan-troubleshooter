@@ -89,6 +89,9 @@ def ask(
         messages=messages,
     )
 
-    answer = response.content[0].text
+    text_blocks = [b for b in response.content if hasattr(b, "text")]
+    if not text_blocks:
+        raise RuntimeError("Claude returned no text in its response.")
+    answer = text_blocks[0].text
     new_history = messages + [{"role": "assistant", "content": answer}]
     return answer, new_history
